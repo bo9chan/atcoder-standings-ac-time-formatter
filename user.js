@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Standings AC Time Formatter
 // @namespace    bo9chan
-// @version      1.0.0
+// @version      1.0.1
 // @description  AtCoderのコンテスト順位表に表示されるAC時間を "Dd H:MM:SS" にフォーマットする
 // @author       bo9chan
 // @supportURL   https://github.com/bo9chan/atcoder-standings-ac-time-formatter
@@ -59,9 +59,16 @@
         targetNode = document.getElementById('standings-tbody');
         if (targetNode) {
             parentObserver.disconnect();
+            const config = { childList: true, subtree: true };
+            const observer = new MutationObserver((mutations, obs) => {
+                // 再帰トリガーを止める
+                obs.disconnect();
+                // フォーマット処理を実行
+                handleMutation();
+                // 監視を再開
+                obs.observe(targetNode, config);
+            });
             handleMutation();
-            const config = { childList: true, subtree: true, characterData: true };
-            const observer = new MutationObserver(handleMutation);
             observer.observe(targetNode, config);
         }
     }
